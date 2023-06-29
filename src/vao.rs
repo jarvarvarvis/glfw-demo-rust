@@ -1,5 +1,8 @@
+use crate::vbo::Vbo;
+
 pub struct Vao {
-    handle: u32
+    handle: u32,
+    vbos: Vec<Vbo>
 }
 
 impl Vao {
@@ -9,7 +12,11 @@ impl Vao {
             gl::GenVertexArrays(1, &mut handle);
         }
 
-        Self { handle }
+        Self { handle, vbos: vec![] }
+    }
+
+    pub fn add_vbo(&mut self, vbo: Vbo) {
+        self.vbos.push(vbo);
     }
 
     pub fn bind(&self) {
@@ -21,6 +28,14 @@ impl Vao {
     pub fn unbind(&self) {
         unsafe {
             gl::BindVertexArray(0);
+        }
+    }
+}
+
+impl Drop for Vao {
+    fn drop(&mut self) {
+        unsafe {
+            gl::DeleteVertexArrays(1, &self.handle as *const _);
         }
     }
 }

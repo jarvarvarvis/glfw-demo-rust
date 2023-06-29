@@ -12,6 +12,7 @@ fn main() {
         .expect("Failed to create GLFW window.");
 
     window.set_key_polling(true);
+    window.set_framebuffer_size_polling(true);
     window.make_current();
 
     gl::load_with(|s| window.get_proc_address(s) as *const _);
@@ -33,6 +34,11 @@ fn main() {
 
 fn handle_window_event(window: &mut glfw::Window, event: glfw::WindowEvent) {
     match event {
+        glfw::WindowEvent::FramebufferSize(width, height) => {
+            // make sure the viewport matches the new window dimensions; note that width and
+            // height will be significantly larger than specified on retina displays.
+            unsafe { gl::Viewport(0, 0, width, height) }
+        }
         glfw::WindowEvent::Key(Key::Escape, _, Action::Press, _) => window.set_should_close(true),
         _ => {}
     }

@@ -3,6 +3,9 @@ extern crate glfw;
 
 pub mod shader;
 pub mod program;
+pub mod vbo;
+pub mod vao;
+pub mod mesh;
 
 use glfw::{Action, Context, Key};
 use program::Program;

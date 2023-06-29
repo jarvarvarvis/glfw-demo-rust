@@ -59,6 +59,18 @@ impl Program {
         Ok(())
     }
 
+    pub fn bind(&self) {
+        unsafe {
+            gl::UseProgram(self.handle);
+        }
+    }
+
+    pub fn unbind(&self) {
+        unsafe {
+            gl::UseProgram(0);
+        }
+    }
+
     pub fn from_shaders(shaders: Vec<Shader>) -> anyhow::Result<Self> {
         let program = Self::create();
         program.attach(shaders);

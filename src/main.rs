@@ -1,10 +1,46 @@
 extern crate gl;
 extern crate glfw;
 
-use gl::types::*;
-use glfw::{Action, Context, Key};
+pub mod shader;
+pub mod program;
 
-fn main() {
+use glfw::{Action, Context, Key};
+use program::Program;
+use shader::Shader;
+
+use crate::shader::shader_from_source;
+
+fn create_vert_shader() -> anyhow::Result<Shader> {
+    shader_from_source! {
+        gl::VERTEX_SHADER,
+        r#"#version 330 core
+        layout (location = 0) in vec3 vpos;
+        void main() {
+            gl_Position = vec4(vpos, 1.0);
+        }"#
+    }
+}
+
+fn create_frag_shader() -> anyhow::Result<Shader> {
+    shader_from_source! {
+        gl::FRAGMENT_SHADER,
+        r#"#version 330 core
+        out vec4 FragColor;
+        void main() {
+           FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+        }"#
+    }
+}
+
+fn create_program() -> anyhow::Result<Program> {
+    Program::from_shaders(
+        vec![ 
+            create_vert_shader()?, 
+            create_frag_shader()? 
+        ])
+}
+
+fn main() -> anyhow::Result<()> {
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
 
     let (mut window, events) = glfw
@@ -16,6 +52,8 @@ fn main() {
     window.make_current();
 
     gl::load_with(|s| window.get_proc_address(s) as *const _);
+
+    let program = create_program()?;
 
     while !window.should_close() {
         unsafe {
@@ -30,6 +68,8 @@ fn main() {
             handle_window_event(&mut window, event);
         }
     }
+
+    Ok(())
 }
 
 fn handle_window_event(window: &mut glfw::Window, event: glfw::WindowEvent) {

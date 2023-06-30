@@ -27,7 +27,7 @@ impl Program {
         let mut info_log = Vec::with_capacity(512);
         unsafe {
             info_log.set_len(512 - 1); // subtract 1 to skip the trailing null character
-            gl::GetProgramiv(self.handle, gl::COMPILE_STATUS, &mut success);
+            gl::GetProgramiv(self.handle, gl::LINK_STATUS, &mut success);
             if success != gl::TRUE as GLint {
                 gl::GetProgramInfoLog(self.handle, 512, ptr::null_mut(), info_log.as_mut_ptr() as *mut GLchar);
                 return Some(String::from_utf8(info_log).unwrap());
